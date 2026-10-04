@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DataGuard · 数据变更治理</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/runtime.css">
+  <link rel="stylesheet" href="/intelligence.css">
+  <link rel="stylesheet" href="/enterprise.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">DG</span><span><b>DataGuard</b><small>Change Control Plane</small></span></div>
+    <nav>
+      <button class="nav-item active" data-view="overview"><span>⌂</span>治理总览</button>
+      <button class="nav-item" data-view="changes"><span>↻</span>变更工作台 <i id="nav-count">0</i></button>
+      <button class="nav-item" data-view="assets"><span>◇</span>资产与血缘</button>
+      <button class="nav-item" data-view="policies"><span>⌘</span>策略与门禁</button>
+      <button class="nav-item" data-view="evidence"><span>◎</span>证据与审计</button>
+      <button class="nav-item" data-view="intelligence"><span>✦</span>智能治理</button>
+    </nav>
+    <div class="side-section">系统</div>
+    <nav>
+      <button class="nav-item" data-view="connectors"><span>⇄</span>连接器</button>
+      <button class="nav-item" data-view="observability"><span>⌁</span>可观测性</button>
+    </nav>
+    <div class="environment-card">
+      <span class="pulse"></span>
+      <div><b>演示环境正常</b><small>控制面 · H2 · 无生产副作用</small></div>
+    </div>
+    <div class="profile"><span class="avatar">周</span><div><b>周航</b><small>Governance Admin</small></div><span>•••</span></div>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <div class="breadcrumb">数据治理 <span>/</span> <b id="breadcrumb-current">治理总览</b></div>
+      <div class="top-actions"><div class="search">⌕ <input id="global-search" placeholder="搜索变更、资产或负责人"></div><button class="icon-button">?</button><button class="icon-button">♢<em></em></button><button class="primary-button" id="new-change">＋ 新建变更</button></div>
+    </header>
+
+    <div class="content">
+      <section id="overview-view" class="view active">
+        <div class="page-heading">
+          <div><p class="eyebrow">CONTROL PLANE</p><h1>数据变更治理总览</h1><p>让每一次变更都有影响范围、发布证据和可执行的恢复路径。</p></div>
+          <div class="heading-actions"><span class="updated">数据刚刚更新</span><button class="secondary-button" id="refresh">↻ 刷新</button></div>
+        </div>
+        <div class="metrics" id="metrics"></div>
+        <div class="grid-main">
+          <section class="panel change-panel">
+            <div class="panel-head"><div><h2>活跃变更</h2><p>需要关注的治理流程和下一步操作</p></div><button class="text-button" data-go="changes">查看全部 →</button></div>
+            <div class="filter-row"><div class="segmented"><button class="selected" data-filter="all">全部</button><button data-filter="attention">需关注</button><button data-filter="mine">我负责的</button></div><div class="mini-search">⌕ <input id="table-search" placeholder="筛选变更"></div></div>
+            <div class="table-wrap"><table><thead><tr><th>变更</th><th>目标资产</th><th>风险</th><th>当前阶段</th><th>负责人</th><th>更新时间</th></tr></thead><tbody id="change-rows"></tbody></table></div>
+          </section>
+          <aside class="right-column">
+            <section class="panel attention-panel">
+              <div class="panel-head"><div><h2>治理关注</h2><p>按风险与阻断优先排序</p></div><span class="count-pill" id="attention-count">0</span></div>
+              <div id="attention-list"></div>
+            </section>
+            <section class="panel health-panel">
+              <div class="panel-head"><div><h2>治理健康度</h2><p>近 30 天关键覆盖情况</p></div><button class="icon-button small">•••</button></div>
+              <div id="health-list"></div>
+            </section>
+          </aside>
+        </div>
+        <section class="panel flow-panel">
+          <div class="panel-head"><div><h2>标准发布路径</h2><p>所有生产变更必须通过确定性门禁和人工授权</p></div><span class="legend"><i class="dot done"></i> 已完成 <i class="dot current"></i> 进行中 <i class="dot pending"></i> 待执行</span></div>
+          <div class="flow">
+            <div class="flow-step done"><span>✓</span><b>影响分析</b><small>Lineage + AST</small></div><i></i>
+            <div class="flow-step done"><span>✓</span><b>契约验证</b><small>Contract + Quality</small></div><i></i>
+            <div class="flow-step current"><span>3</span><b>审批与冻结</b><small>Policy + Owner</small></div><i></i>
+            <div class="flow-step"><span>4</span><b>Shadow</b><small>业务窗口对账</small></div><i></i>
+            <div class="flow-step"><span>5</span><b>Canary</b><small>5% → 25%</small></div><i></i>
+            <div class="flow-step"><span>6</span><b>生产观察</b><small>Promote + Watch</small></div>
+          </div>
+        </section>
+      </section>
+
+      <section id="changes-view" class="view">
+        <div class="page-heading"><div><p class="eyebrow">CHANGE WORKSPACE</p><h1>变更工作台</h1><p>从建档、验证到发布与恢复，查看完整治理轨迹。</p></div><button class="primary-button new-change-copy">＋ 新建变更</button></div>
+        <div class="workspace-grid"><section class="panel list-panel"><div class="list-toolbar"><b>全部变更</b><input id="workspace-search" placeholder="按标题或资产筛选"></div><div id="change-cards"></div></section><section class="panel details-panel" id="details-panel"><div class="empty-state"><span>↻</span><h3>选择一条变更</h3><p>查看风险、门禁、影响范围与完整证据链。</p></div></section></div>
+      </section>
+
+      <section id="runtime-view" class="view">
+        <div class="page-heading"><div><p class="eyebrow">EXECUTION RUNTIME</p><h1>执行运行时与可观测性</h1><p>所有副作用均通过幂等连接器执行，并产生可追溯的 Execution Receipt。</p></div><span class="badge status-badge">LOCAL SAFE MODE</span></div>
+        <div class="runtime-metrics" id="runtime-metrics"></div>
+        <div class="runtime-grid">
+          <section class="panel"><div class="panel-head"><div><h2>Connector Gateway</h2><p>凭证外置、幂等调用、统一重试预算</p></div></div><div id="connector-list" class="runtime-list"></div></section>
+          <section class="panel"><div class="panel-head"><div><h2>SLO 状态</h2><p>生产变更执行与恢复指标</p></div></div><div id="slo-list" class="runtime-list"></div></section>
+        </div>
+        <section class="panel runtime-note"><b>Temporal-ready 编排边界</b><p>当前默认使用持久化本地安全执行器，工作流活动、幂等键、Attempt Budget、资源版本和 Trace ID 已进入统一执行模型；切换真实 Temporal Worker 与生产 Connector 时无需改变治理状态机。</p></section>
+      </section>
+
+      <section id="intelligence-view" class="view">
+        <div class="page-heading"><div><p class="eyebrow">GOVERNANCE INTELLIGENCE</p><h1>智能治理与评测</h1><p>Agent 只生成候选结论；证据验证后才进入正式治理事实。</p></div><span class="badge status-badge" id="provider-badge">LOCAL</span></div>
+        <div class="intelligence-toolbar panel"><label>分析对象<select id="intelligence-change"></select></label><button class="primary-button" id="run-agent">运行四类 Skills</button><button class="secondary-button" id="run-replay">Replay 评测</button></div>
+        <div class="intelligence-metrics" id="intelligence-metrics"></div>
+        <div class="skill-grid" id="skill-grid"></div>
+        <div class="intelligence-grid">
+          <section class="panel"><div class="panel-head"><div><h2>Candidate Findings</h2><p>待 Evidence Verification 的模型候选</p></div></div><div id="finding-list" class="intelligence-list"></div></section>
+          <section class="panel"><div class="panel-head"><div><h2>RAG 知识库</h2><p>带权威等级和版本的受控语料</p></div></div><div id="knowledge-list" class="intelligence-list"></div></section>
+        </div>
+      </section>
+
+      <section id="enterprise-view" class="view">
+        <div class="page-heading"><div><p class="eyebrow">ENTERPRISE GOVERNANCE</p><h1 id="enterprise-title">资产与血缘</h1><p id="enterprise-subtitle">确认事实、候选依赖与可执行 Contract。</p></div><span class="badge status-badge">CONTROL PLANE</span></div>
+        <div id="enterprise-metrics" class="intelligence-metrics"></div>
+        <div class="enterprise-grid"><section class="panel"><div class="panel-head"><div><h2 id="enterprise-left-title">资产目录</h2><p id="enterprise-left-subtitle">资产所有者、等级和分类</p></div></div><div id="enterprise-left" class="enterprise-list"></div></section><section class="panel"><div class="panel-head"><div><h2 id="enterprise-right-title">血缘关系</h2><p id="enterprise-right-subtitle">confirmed 与 candidate 分离</p></div></div><div id="enterprise-right" class="enterprise-list"></div></section></div>
+      </section>
+
+      <section id="placeholder-view" class="view"><div class="placeholder panel"><span>◇</span><h1 id="placeholder-title">能力建设中</h1><p>此模块已在总体架构中定义，将在后续阶段接入。</p><button class="secondary-button" data-go="overview">返回总览</button></div></section>
+    </div>
+  </main>
+</div>
+
+<dialog id="create-dialog">
+  <form id="create-form">
+    <div class="dialog-head"><div><p class="eyebrow">NEW CHANGE</p><h2>创建数据变更</h2><p>先建立可审计对象，再开始影响分析。</p></div><button type="button" class="close-dialog">×</button></div>
+    <div class="form-grid">
+      <label class="wide">变更标题<input name="title" required placeholder="例如：订单金额精度升级"></label>
+      <label>变更类型<select name="type"><option>SCHEMA</option><option>SEMANTIC</option><option>PIPELINE</option><option>METRIC</option><option>SOURCE</option><option>QUALITY</option></select></label>
+      <label>目标环境<select name="targetEnvironment"><option>DEV</option><option>STAGING</option><option>PROD</option></select></label>
+      <label class="wide">目标资产<input name="assetQualifiedName" required placeholder="warehouse.dwd_order"></label>
+      <label>资产等级<select name="assetTier"><option>P2</option><option>P1</option><option>P0</option><option>P3</option></select></label>
+      <label>负责人<input name="owner" required value="zhou.hang"></label>
+      <label>下游消费者数<input name="consumerCount" type="number" min="0" value="1"></label>
+      <label class="checks"><input name="destructive" type="checkbox">破坏性变更</label>
+      <label class="checks"><input name="recoveryPlanPresent" type="checkbox">已准备恢复计划</label>
+      <label class="wide">变更说明<textarea name="description" required placeholder="说明业务目的、范围和验收条件"></textarea></label>
+      <label>变更前 Schema<textarea name="beforeSchema" placeholder="字段或语义快照"></textarea></label>
+      <label>变更后 Schema<textarea name="afterSchema" required placeholder="目标字段或语义快照"></textarea></label>
+    </div>
+    <div class="dialog-actions"><button type="button" class="secondary-button close-dialog">取消</button><button type="submit" class="primary-button">创建并建档</button></div>
+  </form>
+</dialog>
+<div id="toast" role="status"></div>
+<script src="/app.js"></script>
+</body>
+</html>

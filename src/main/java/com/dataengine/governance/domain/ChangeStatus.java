@@ -1,0 +1,24 @@
+package com.dataengine.governance.domain;
+
+public enum ChangeStatus {
+    DRAFT,
+    DISCOVERING,
+    IMPACT_ANALYZED,
+    VALIDATING,
+    VALIDATION_FAILED,
+    WAITING_APPROVAL,
+    APPROVAL_REJECTED,
+    APPROVED,
+    SHADOWING,
+    SHADOW_FAILED,
+    CANARY,
+    CANARY_FAILED,
+    PROMOTING,
+    PRODUCTION,
+    COMPLETED,
+    ROLLBACK_REQUIRED,
+    ROLLING_BACK,
+    RECOVERED,
+    CANCELLED,
+    EXPIRED
+}

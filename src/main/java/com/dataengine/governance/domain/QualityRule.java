@@ -1,0 +1,7 @@
+package com.dataengine.governance.domain;
+import jakarta.persistence.*; import java.time.Instant; import java.util.UUID;
+@Entity @Table(name="quality_rule") public class QualityRule {
+ @Id private UUID id; @Column(nullable=false) private String assetQualifiedName; @Column(nullable=false) private String name; @Column(nullable=false) private String metric; private double threshold; @Enumerated(EnumType.STRING) @Column(nullable=false) private GateStatus severity; @Column(nullable=false) private boolean enabled; @Column(nullable=false) private String owner; @Column(nullable=false) private Instant updatedAt;
+ protected QualityRule(){} public QualityRule(String asset,String name,String metric,double threshold,GateStatus severity,String owner){if(severity!=GateStatus.WARN&&severity!=GateStatus.BLOCK)throw new IllegalArgumentException("质量规则严重度只能是 WARN 或 BLOCK");id=UUID.randomUUID();assetQualifiedName=asset;this.name=name;this.metric=metric;this.threshold=threshold;this.severity=severity;enabled=true;this.owner=owner;updatedAt=Instant.now();}
+ public void disable(){enabled=false;updatedAt=Instant.now();} public UUID getId(){return id;} public String getAssetQualifiedName(){return assetQualifiedName;} public String getName(){return name;} public String getMetric(){return metric;} public double getThreshold(){return threshold;} public GateStatus getSeverity(){return severity;} public boolean isEnabled(){return enabled;} public String getOwner(){return owner;} public Instant getUpdatedAt(){return updatedAt;}
+}

@@ -1,0 +1,10 @@
+target/
+.docx-render-*/
+sources/
+AGENTS.md
+.idea/
+*.iml
+.vscode/
+data/
+*.log
+.DS_Store
